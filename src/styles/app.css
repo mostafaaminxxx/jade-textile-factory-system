@@ -153,6 +153,12 @@ button {
   gap: 16px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .data-pill {
   padding: 8px 11px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -375,6 +381,12 @@ button {
   gap: 10px;
 }
 
+.module-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 10px;
+}
+
 .sewing-summary > div {
   display: flex;
   align-items: center;
@@ -476,6 +488,177 @@ button {
   font-size: 0.8rem;
 }
 
+.table-wrap {
+  overflow-x: auto;
+  margin-inline: -2px;
+  padding-block-end: 4px;
+}
+
+.industrial-table {
+  inline-size: 100%;
+  min-inline-size: 1100px;
+  border-collapse: collapse;
+}
+
+.industrial-table th,
+.industrial-table td {
+  padding: 11px 10px;
+  border-block-end: 1px solid rgba(255, 255, 255, 0.07);
+  color: #cbd5d1;
+  font-size: 0.78rem;
+  text-align: start;
+  vertical-align: top;
+}
+
+.industrial-table th {
+  color: #8fa09a;
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.industrial-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.stacked-cell {
+  display: grid;
+  gap: 3px;
+  min-inline-size: 130px;
+}
+
+.stacked-cell small {
+  color: #8fa09a;
+  font-size: 0.72rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-inline-size: 180px;
+  padding: 5px 8px;
+  border: 1px solid color-mix(in srgb, var(--tone) 42%, transparent);
+  border-radius: 8px;
+  color: var(--tone);
+  background: color-mix(in srgb, var(--tone) 10%, transparent);
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.row-action,
+.icon-command,
+.primary-action,
+.icon-only {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: #202724;
+  color: #eef4ef;
+  cursor: pointer;
+  font-weight: 850;
+}
+
+.row-action {
+  padding: 7px 9px;
+  font-size: 0.74rem;
+  white-space: nowrap;
+}
+
+.icon-command,
+.primary-action {
+  min-block-size: 36px;
+  padding: 8px 11px;
+  font-size: 0.78rem;
+}
+
+.primary-action {
+  border-color: rgba(52, 211, 153, 0.5);
+  background: rgba(52, 211, 153, 0.15);
+  color: #6ee7b7;
+}
+
+.icon-only {
+  inline-size: 34px;
+  block-size: 34px;
+  padding: 0;
+}
+
+.drawer-shell {
+  position: fixed;
+  z-index: 10;
+  inset-block: 22px;
+  inset-inline-end: 22px;
+  display: grid;
+  align-items: start;
+  inline-size: min(420px, calc(100vw - 28px));
+}
+
+.drawer-card {
+  display: grid;
+  gap: 14px;
+  max-block-size: calc(100vh - 44px);
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: #151a18;
+  box-shadow: 0 22px 80px rgba(0, 0, 0, 0.42);
+}
+
+.shell-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+}
+
+.shell-form label {
+  display: grid;
+  gap: 6px;
+  color: #8fa09a;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.shell-form input,
+.shell-form select {
+  inline-size: 100%;
+  min-block-size: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 8px;
+  background: #101614;
+  color: #eef4ef;
+  padding: 8px 10px;
+}
+
+.shell-form .primary-action {
+  grid-column: 1 / -1;
+}
+
+.gate-warning {
+  display: block;
+  margin-block-start: 6px;
+  color: #fecaca;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.gate-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fde68a;
+  background: rgba(245, 158, 11, 0.07);
+}
+
 @media (max-width: 1180px) {
   .kpi-grid {
     grid-template-columns: repeat(3, minmax(160px, 1fr));
@@ -483,6 +666,10 @@ button {
 
   .flow-ribbon {
     grid-template-columns: repeat(5, minmax(130px, 1fr));
+  }
+
+  .module-summary {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
   }
 }
 
@@ -499,6 +686,7 @@ button {
 
   .view-tabs,
   .sewing-summary,
+  .module-summary,
   .command-grid {
     grid-template-columns: 1fr;
   }
@@ -519,7 +707,16 @@ button {
     flex-direction: column;
   }
 
+  .header-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .shell-form {
     grid-template-columns: 1fr;
   }
 }
