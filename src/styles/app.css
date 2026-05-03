@@ -1,0 +1,525 @@
+:root {
+  color-scheme: dark;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #0d1110;
+  color: #eef4ef;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-inline-size: 320px;
+  min-block-size: 100vh;
+  background: #0d1110;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: minmax(250px, 290px) 1fr;
+  min-block-size: 100vh;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 220px),
+    #0d1110;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 22px;
+  border-inline-start: 1px solid rgba(255, 255, 255, 0.08);
+  background: #151a18;
+}
+
+.brand-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  inline-size: 42px;
+  block-size: 42px;
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  border-radius: 8px;
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.1);
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: #8fa09a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.brand-block h1,
+.page-header h2 {
+  margin: 0;
+  font-size: 1.18rem;
+  line-height: 1.15;
+}
+
+.view-tabs {
+  display: grid;
+  gap: 10px;
+}
+
+.view-tab {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  inline-size: 100%;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: #1a211e;
+  text-align: start;
+  cursor: pointer;
+}
+
+.view-tab.active {
+  border-color: rgba(52, 211, 153, 0.55);
+  background: #202b26;
+}
+
+.view-tab span,
+.sidebar-status span,
+.sewing-summary span {
+  display: grid;
+  gap: 3px;
+}
+
+.view-tab small,
+.sidebar-status small,
+.sewing-summary small,
+.line-order small,
+.panel-heading span,
+.flow-stage small,
+.kpi-card span,
+.action-row small {
+  color: #8fa09a;
+  font-size: 0.76rem;
+}
+
+.sidebar-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-block-start: auto;
+  padding: 12px;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 8px;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.workspace {
+  min-inline-size: 0;
+  padding: 22px;
+}
+
+.page-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.data-pill {
+  padding: 8px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #cbd5d1;
+  background: #171d1b;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.data-pill[data-source="mock"] {
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #fbbf24;
+}
+
+.data-pill[data-source="supabase"] {
+  border-color: rgba(52, 211, 153, 0.45);
+  color: #6ee7b7;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.kpi-card,
+.command-panel,
+.line-group,
+.line-tile,
+.sewing-summary > div,
+.notice,
+.empty-state.framed {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: #161c1a;
+}
+
+.kpi-card {
+  display: grid;
+  gap: 12px;
+  min-block-size: 136px;
+  padding: 14px;
+}
+
+.kpi-card p,
+.kpi-card strong,
+.kpi-card span {
+  margin: 0;
+}
+
+.kpi-card p {
+  min-block-size: 34px;
+  color: #b9c5c0;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.kpi-card strong {
+  display: block;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.kpi-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 34px;
+  block-size: 34px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tone-green {
+  --tone: #34d399;
+}
+
+.tone-amber {
+  --tone: #f59e0b;
+}
+
+.tone-red {
+  --tone: #ef4444;
+}
+
+.tone-blue {
+  --tone: #38bdf8;
+}
+
+.tone-gray {
+  --tone: #94a3b8;
+}
+
+.kpi-card,
+.line-tile,
+.alert-row,
+.action-row {
+  border-block-start-color: color-mix(in srgb, var(--tone) 70%, transparent);
+}
+
+.kpi-icon,
+.line-tile em,
+.status-dot {
+  color: var(--tone);
+}
+
+.command-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+  gap: 12px;
+}
+
+.wide-panel {
+  grid-column: 1 / -1;
+}
+
+.command-panel,
+.line-group {
+  padding: 16px;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-block-end: 14px;
+}
+
+.panel-heading h3 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.flow-ribbon {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(100px, 1fr));
+  gap: 8px;
+  overflow-x: auto;
+  padding-block-end: 4px;
+}
+
+.flow-stage {
+  min-inline-size: 110px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: #111715;
+}
+
+.flow-stage.live {
+  border-color: rgba(52, 211, 153, 0.32);
+}
+
+.flow-stage.blocked {
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
+.flow-index {
+  display: block;
+  margin-block-end: 18px;
+  color: #8fa09a;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.flow-stage strong,
+.flow-stage small {
+  display: block;
+}
+
+.alert-list,
+.action-list,
+.line-groups {
+  display: grid;
+  gap: 10px;
+}
+
+.alert-row,
+.action-row {
+  display: grid;
+  gap: 4px;
+  padding: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: #111715;
+}
+
+.alert-row span,
+.action-row span {
+  color: #b9c5c0;
+  font-size: 0.78rem;
+}
+
+.insight-copy {
+  margin: 0;
+  color: #cbd5d1;
+  line-height: 1.7;
+}
+
+.notice,
+.empty-state.framed {
+  padding: 12px;
+}
+
+.notice.error {
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fecaca;
+}
+
+.empty-state {
+  margin: 0;
+  color: #8fa09a;
+}
+
+.sewing-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.sewing-summary > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px;
+}
+
+.sewing-summary strong {
+  font-size: 1.28rem;
+}
+
+.status-dot {
+  display: inline-block;
+  inline-size: 12px;
+  block-size: 12px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-dot.green {
+  color: #34d399;
+}
+
+.status-dot.amber {
+  color: #f59e0b;
+}
+
+.line-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 10px;
+}
+
+.line-tile {
+  display: grid;
+  gap: 13px;
+  padding: 13px;
+}
+
+.line-tile header,
+.line-tile footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.line-tile header div,
+.line-order {
+  display: grid;
+  gap: 4px;
+}
+
+.line-tile header strong {
+  font-size: 1.25rem;
+}
+
+.line-tile header span,
+.line-order span {
+  color: #b9c5c0;
+  font-size: 0.8rem;
+}
+
+.line-tile em {
+  padding: 5px 8px;
+  border: 1px solid color-mix(in srgb, var(--tone) 42%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--tone) 10%, transparent);
+  font-size: 0.74rem;
+  font-style: normal;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.line-order strong {
+  font-size: 1rem;
+}
+
+.line-meter {
+  overflow: hidden;
+  inline-size: 100%;
+  block-size: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.line-meter span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--tone);
+}
+
+.line-tile footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #cbd5d1;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 1180px) {
+  .kpi-grid {
+    grid-template-columns: repeat(3, minmax(160px, 1fr));
+  }
+
+  .flow-ribbon {
+    grid-template-columns: repeat(5, minmax(130px, 1fr));
+  }
+}
+
+@media (max-width: 880px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    border-inline-start: 0;
+    border-block-end: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .view-tabs,
+  .sewing-summary,
+  .command-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .workspace,
+  .sidebar {
+    padding: 14px;
+  }
+
+  .page-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
