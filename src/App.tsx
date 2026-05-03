@@ -1,9 +1,12 @@
-import { Activity, Factory, LayoutDashboard, RadioTower } from 'lucide-react';
+import { Activity, ClipboardList, Factory, LayoutDashboard, PackageSearch, RadioTower } from 'lucide-react';
+import type { ComponentType } from 'react';
 import { useState } from 'react';
 import ExecutiveCommandCenter from './pages/ExecutiveCommandCenter';
+import OrderMaster from './pages/OrderMaster';
+import PreStockReadiness from './pages/PreStockReadiness';
 import SewingControlRoom from './pages/SewingControlRoom';
 
-type ViewKey = 'executive' | 'sewing';
+type ViewKey = 'executive' | 'sewing' | 'orders' | 'pre-stock';
 
 const views: Array<{
   key: ViewKey;
@@ -23,11 +26,30 @@ const views: Array<{
     caption: 'Live line layout from factory assignments',
     icon: Factory,
   },
+  {
+    key: 'orders',
+    label: 'Order Master',
+    caption: 'Order, PO, style, shipment, and stage',
+    icon: ClipboardList,
+  },
+  {
+    key: 'pre-stock',
+    label: 'Pre-Stock Readiness',
+    caption: 'Material gate before planning',
+    icon: PackageSearch,
+  },
 ];
+
+const pageByView: Record<ViewKey, ComponentType> = {
+  executive: ExecutiveCommandCenter,
+  sewing: SewingControlRoom,
+  orders: OrderMaster,
+  'pre-stock': PreStockReadiness,
+};
 
 export default function App() {
   const [activeView, setActiveView] = useState<ViewKey>('executive');
-  const ActivePage = activeView === 'executive' ? ExecutiveCommandCenter : SewingControlRoom;
+  const ActivePage = pageByView[activeView];
 
   return (
     <div className="app-shell" dir="rtl">
