@@ -1,6 +1,6 @@
 import { Clock3, Users } from 'lucide-react';
 import { productionAchievementPercent, roundMetric } from '../lib/factoryFormulas';
-import { isGhostLine, normalizeLineStatus, statusTone } from '../lib/riskRules';
+import { normalizeLineStatus, statusTone } from '../lib/riskRules';
 
 export type LineTileData = {
   lineCode: string;
@@ -15,6 +15,7 @@ export type LineTileData = {
   manpower: number;
   activeDowntime: string;
   isActive: boolean;
+  isGhost: boolean;
   notes?: string;
 };
 
@@ -24,7 +25,7 @@ type LineTileProps = {
 
 export default function LineTile({ line }: LineTileProps) {
   const normalizedStatus = normalizeLineStatus(line.status);
-  const tone = isGhostLine(line.lineCode) || !line.isActive ? 'gray' : statusTone[normalizedStatus];
+  const tone = line.isGhost || !line.isActive ? 'gray' : statusTone[normalizedStatus];
   const achievement = productionAchievementPercent(line.actual, line.target);
 
   return (
@@ -34,7 +35,7 @@ export default function LineTile({ line }: LineTileProps) {
           <strong>{line.lineCode}</strong>
           <span>{line.group}</span>
         </div>
-        <em>{isGhostLine(line.lineCode) ? 'ghost' : normalizedStatus}</em>
+        <em>{line.isGhost ? 'ghost' : normalizedStatus}</em>
       </header>
 
       <div className="line-order">
