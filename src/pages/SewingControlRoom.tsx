@@ -1,26 +1,8 @@
 import { Factory, Layers3 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import LineTile, { type LineTileData } from '../components/LineTile';
-import { isGhostOrNonWorkingLine, normalizeLineCode } from '../lib/riskRules';
+import { isGhostProductionArea, normalizeLineCode } from '../lib/riskRules';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-
-type AssignmentRow = {
-  line_id: string;
-  assignment_date: string;
-  status: string;
-  current_customer_name: string | null;
-  current_style_code: string | null;
-  current_po_number: string | null;
-  target_qty: number;
-  actual_qty: number;
-  manpower: number;
-  active_downtime_type: string | null;
-  orders: {
-    po_number: string | null;
-    shipment_date: string | null;
-    style_code: string;
-  } | null;
-};
 
 type LineQueryRow = {
   id: string;
@@ -34,6 +16,27 @@ type LineQueryRow = {
   production_groups: {
     group_code: string;
     group_name: string;
+  } | null;
+};
+
+type AssignmentQueryRow = {
+  id: string;
+  line_id: string;
+  assignment_date: string;
+  status: string;
+  current_customer_name: string | null;
+  current_style_code: string | null;
+  current_po_number: string | null;
+  target_qty: number;
+  actual_qty: number;
+  manpower: number;
+  active_downtime_type: string | null;
+  last_event_at: string | null;
+  created_at: string;
+  orders: {
+    po_number: string | null;
+    shipment_date: string | null;
+    style_code: string;
   } | null;
 };
 
@@ -59,6 +62,7 @@ const mockLines: LineTileData[] = [
     manpower: 31,
     activeDowntime: 'none',
     isActive: true,
+    isGhost: false,
     notes: 'H93/115 legacy reference normalized to H93.',
   },
   {
@@ -74,6 +78,7 @@ const mockLines: LineTileData[] = [
     manpower: 28,
     activeDowntime: 'material',
     isActive: true,
+    isGhost: false,
     notes: 'G-14 correction preserved.',
   },
   {
@@ -89,21 +94,39 @@ const mockLines: LineTileData[] = [
     manpower: 0,
     activeDowntime: 'ghost line',
     isActive: false,
+    isGhost: true,
     notes: 'Ghost/non-working line.',
   },
 ];
 
-const selectLatestAssignmentByLine = (assignments: AssignmentRow[]) => {
-  return assignments.reduce<Record<string, AssignmentRow>>((latestByLine, assignment) => {
-    const current = latestByLine[assignment.line_id];
-    if (!current || assignment.assignment_date > current.assignment_date) {
-      latestByLine[assignment.line_id] = assignment;
+const assignmentTime = (assignment: AssignmentQueryRow) =>
+  new Date(assignment.last_event_at ?? assignment.created_at).getTime();
+
+const pickCurrentAssignment = (assignments: AssignmentQueryRow[], currentDate = todayIso()) => {
+  const todayAssignments = assignments.filter((assignment) => assignment.assignment_date === currentDate);
+  const candidates = todayAssignments.length > 0 ? todayAssignments : assignments;
+
+  return [...candidates].sort((left, right) => {
+    const dateCompare = right.assignment_date.localeCompare(left.assignment_date);
+    if (dateCompare !== 0) {
+      return dateCompare;
     }
-    return latestByLine;
-  }, {});
+
+    return assignmentTime(right) - assignmentTime(left);
+  })[0];
 };
 
-const toLineTile = (line: LineQueryRow, assignment?: AssignmentRow): LineTileData => {
+const groupAssignmentsByLine = (assignments: AssignmentQueryRow[]) =>
+  assignments.reduce<Record<string, AssignmentQueryRow[]>>((groups, assignment) => {
+    groups[assignment.line_id] = [...(groups[assignment.line_id] ?? []), assignment];
+    return groups;
+  }, {});
+
+const toLineTile = (
+  line: LineQueryRow,
+  assignmentsByLine: Record<string, AssignmentQueryRow[]>,
+): LineTileData => {
+  const assignment = pickCurrentAssignment(assignmentsByLine[line.id] ?? []);
   const normalizedLineCode = normalizeLineCode(line.line_code);
   const group =
     line.production_groups?.group_name ??
@@ -111,9 +134,10 @@ const toLineTile = (line: LineQueryRow, assignment?: AssignmentRow): LineTileDat
     line.zone ??
     line.floor ??
     'Ungrouped';
-  const isGhost = isGhostOrNonWorkingLine({
+  const isGhost = isGhostProductionArea({
     lineCode: line.line_code,
     groupCode: line.production_groups?.group_code,
+    groupName: line.production_groups?.group_name,
     zone: line.zone,
     lineType: line.line_type,
     isActive: line.is_active,
@@ -127,12 +151,13 @@ const toLineTile = (line: LineQueryRow, assignment?: AssignmentRow): LineTileDat
     style: assignment?.current_style_code ?? assignment?.orders?.style_code ?? 'Idle',
     po: assignment?.current_po_number ?? assignment?.orders?.po_number ?? 'N/A',
     shipmentDate: assignment?.orders?.shipment_date ?? 'N/A',
-    status: isGhost ? 'idle' : assignment?.status ?? 'idle',
+    status: isGhost ? 'idle' : (assignment?.status ?? 'idle'),
     target: assignment?.target_qty ?? 0,
     actual: assignment?.actual_qty ?? 0,
     manpower: assignment?.manpower ?? 0,
-    activeDowntime: isGhost ? 'ghost/non-working' : assignment?.active_downtime_type ?? 'none',
+    activeDowntime: isGhost ? 'ghost/non-working' : (assignment?.active_downtime_type ?? 'none'),
     isActive: !isGhost,
+    isGhost,
     notes: line.notes ?? undefined,
   };
 };
@@ -157,44 +182,53 @@ export default function SewingControlRoom() {
       setLoading(true);
       setError(null);
 
-      const today = todayIso();
-      const [linesResult, todayAssignmentsResult] = await Promise.all([
-        supabase
-          .from('factory_lines')
-          .select(
-            `
-            id,
-            line_code,
-            zone,
-            floor,
-            line_type,
-            is_active,
-            is_core_production,
-            notes,
-            production_groups(group_code, group_name)
-          `,
-          )
-          .order('line_code', { ascending: true }),
-        supabase
-          .from('line_current_assignments')
-          .select(
-            `
-            line_id,
-            assignment_date,
-            status,
-            current_customer_name,
-            current_style_code,
-            current_po_number,
-            target_qty,
-            actual_qty,
-            manpower,
-            active_downtime_type,
-            orders(po_number, shipment_date, style_code)
-          `,
-          )
-          .eq('assignment_date', today)
-          .order('assignment_date', { ascending: false }),
-      ]);
+      const linesResult = await supabase
+        .from('factory_lines')
+        .select(
+          `
+          id,
+          line_code,
+          zone,
+          floor,
+          line_type,
+          is_active,
+          is_core_production,
+          notes,
+          production_groups(group_code, group_name)
+        `,
+        )
+        .order('line_code', { ascending: true });
+
+      const lineRows = (linesResult.data ?? []) as unknown as LineQueryRow[];
+      const lineIds = lineRows.map((line) => line.id);
+
+      const assignmentsResult =
+        lineIds.length === 0
+          ? { data: [], error: null }
+          : await supabase
+              .from('line_current_assignments')
+              .select(
+                `
+                id,
+                line_id,
+                assignment_date,
+                status,
+                current_customer_name,
+                current_style_code,
+                current_po_number,
+                target_qty,
+                actual_qty,
+                manpower,
+                active_downtime_type,
+                last_event_at,
+                created_at,
+                orders(po_number, shipment_date, style_code)
+              `,
+              )
+              .in('line_id', lineIds)
+              .order('assignment_date', { ascending: false })
+              .order('last_event_at', { ascending: false, nullsFirst: false })
+              .order('created_at', { ascending: false });
 
       if (!isMounted) {
         return;
@@ -202,19 +236,16 @@ export default function SewingControlRoom() {
 
       setSource('supabase');
 
-      const firstError = linesResult.error ?? todayAssignmentsResult.error;
-      if (firstError) {
-        setError(firstError.message);
+      const queryError = linesResult.error ?? assignmentsResult.error;
+
+      if (queryError) {
+        setError(queryError.message);
         setLines([]);
       } else {
-        const assignmentsByLine = selectLatestAssignmentByLine(
-          ((todayAssignmentsResult.data ?? []) as unknown as AssignmentRow[]),
+        const assignmentsByLine = groupAssignmentsByLine(
+          (assignmentsResult.data ?? []) as unknown as AssignmentQueryRow[],
         );
-        setLines(
-          ((linesResult.data ?? []) as unknown as LineQueryRow[]).map((line) =>
-            toLineTile(line, assignmentsByLine[line.id]),
-          ),
-        );
+        setLines(lineRows.map((line) => toLineTile(line, assignmentsByLine)));
       }
 
       setLoading(false);
