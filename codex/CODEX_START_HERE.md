@@ -29,6 +29,7 @@ Do not commit real keys. When env values are missing, the app uses mock fallback
 - `src/pages/ExecutiveCommandCenter.tsx` is the first screen.
 - `src/pages/SewingControlRoom.tsx` is the second screen.
 - `src/App.tsx` connects both screens through one working shell, not disconnected pages.
+- `.github/workflows/ci.yml` runs install, lint, and build for pushes and pull requests.
 
 ## Data Notes
 
@@ -37,6 +38,7 @@ Do not commit real keys. When env values are missing, the app uses mock fallback
 - `G-14` is preserved as the corrected line code.
 - `G-11` is ghost/non-working.
 - Historical events belong in `audit_events` with JSON snapshots in `old_values` and `new_values`.
+- `supabase/migrations/003_authenticated_development_rls_policies.sql` contains V1 authenticated development RLS policies. These are intentionally broad for foundation work and must be tightened before production exposure.
 
 ## Commands
 
