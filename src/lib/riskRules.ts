@@ -36,7 +36,48 @@ export const normalizeLineCode = (lineCode: string) => {
   return compact;
 };
 
+export const normalizeGroupCode = (value?: string | null) => {
+  if (!value) {
+    return '';
+  }
+
+  const compact = value.trim().toUpperCase().replace(/\s+/g, '');
+  if (compact === 'G11') {
+    return 'G-11';
+  }
+  if (compact === 'G14') {
+    return 'G-14';
+  }
+
+  return value.trim().toUpperCase();
+};
+
 export const isGhostLine = (lineCode: string) => normalizeLineCode(lineCode) === 'G-11';
+
+export const isGhostOrNonWorkingLine = (params: {
+  lineCode?: string | null;
+  groupCode?: string | null;
+  zone?: string | null;
+  lineType?: string | null;
+  isActive?: boolean | null;
+  isCoreProduction?: boolean | null;
+}) => {
+  const lineCode = params.lineCode ? normalizeLineCode(params.lineCode) : '';
+  const groupCode = normalizeGroupCode(params.groupCode);
+  const zone = normalizeGroupCode(params.zone);
+  const lineType = params.lineType?.trim().toLowerCase() ?? '';
+
+  return (
+    lineCode === 'G-11' ||
+    groupCode === 'G-11' ||
+    zone === 'G-11' ||
+    lineType === 'ghost' ||
+    lineType === 'non_working' ||
+    lineType === 'non-working' ||
+    params.isActive === false ||
+    params.isCoreProduction === false
+  );
+};
 
 export const riskTone = (risk?: string | null) => {
   if (risk === 'critical' || risk === 'high' || risk === 'red') {
