@@ -36,48 +36,49 @@ export const normalizeLineCode = (lineCode: string) => {
   return compact;
 };
 
-export const normalizeGroupCode = (value?: string | null) => {
-  if (!value) {
-    return '';
-  }
-
-  const compact = value.trim().toUpperCase().replace(/\s+/g, '');
-  if (compact === 'G11') {
-    return 'G-11';
-  }
-  if (compact === 'G14') {
-    return 'G-14';
-  }
-
-  return value.trim().toUpperCase();
-};
-
 export const isGhostLine = (lineCode: string) => normalizeLineCode(lineCode) === 'G-11';
 
-export const isGhostOrNonWorkingLine = (params: {
-  lineCode?: string | null;
+type GhostProductionAreaInput = {
+  lineCode: string;
   groupCode?: string | null;
+  groupName?: string | null;
   zone?: string | null;
   lineType?: string | null;
-  isActive?: boolean | null;
-  isCoreProduction?: boolean | null;
-}) => {
-  const lineCode = params.lineCode ? normalizeLineCode(params.lineCode) : '';
-  const groupCode = normalizeGroupCode(params.groupCode);
-  const zone = normalizeGroupCode(params.zone);
-  const lineType = params.lineType?.trim().toLowerCase() ?? '';
+  isActive: boolean;
+  isCoreProduction: boolean;
+};
 
+const hasGhostMarker = (value?: string | null) => {
+  if (!value) {
+    return false;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  const compactAreaCode = normalized.replace(/[-_\s]/g, '');
   return (
-    lineCode === 'G-11' ||
-    groupCode === 'G-11' ||
-    zone === 'G-11' ||
-    lineType === 'ghost' ||
-    lineType === 'non_working' ||
-    lineType === 'non-working' ||
-    params.isActive === false ||
-    params.isCoreProduction === false
+    compactAreaCode === 'g11' ||
+    normalized === 'ghost' ||
+    normalized.includes('ghost') ||
+    /non[-_\s]?working/.test(normalized)
   );
 };
+
+export const isGhostProductionArea = ({
+  lineCode,
+  groupCode,
+  groupName,
+  zone,
+  lineType,
+  isActive,
+  isCoreProduction,
+}: GhostProductionAreaInput) =>
+  isGhostLine(lineCode) ||
+  hasGhostMarker(groupCode) ||
+  hasGhostMarker(groupName) ||
+  hasGhostMarker(zone) ||
+  hasGhostMarker(lineType) ||
+  !isActive ||
+  !isCoreProduction;
 
 export const riskTone = (risk?: string | null) => {
   if (risk === 'critical' || risk === 'high' || risk === 'red') {
